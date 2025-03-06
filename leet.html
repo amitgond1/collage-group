@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode Clone</title>
+  <style>
+    :root {
+      --bg-color: #1a1a1a;
+      --text-color: #fff;
+      --button-bg: #4e54c8;
+      --button-text: #fff;
+      --accent-color: #6b72d6;
+      --box-bg: rgba(255, 255, 255, 0.1);
+      --timer-color: #ffcc00;
+      --question-color: #ffeb3b;
+      --correct-color: #4caf50;
+      --incorrect-color: #f44336;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      width: 100%;
+      padding: 10px 20px;
+      background: var(--accent-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-color);
+      font-size: 1.5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .timer {
+      font-size: 1.8rem;
+      color: var(--timer-color);
+    }
+    .main-container {
+      display: flex;
+      width: 100%;
+      height: calc(100vh - 60px);
+    }
+    .question-container, .editor-container {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: var(--box-bg);
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .editor-container {
+      border-right: none;
+    }
+    h2 {
+      margin: 10px 0;
+      font-size: 2rem;
+    }
+    textarea {
+      width: 100%;
+      height: 70%;
+      background: #333;
+      color: #fff;
+      border-radius: 5px;
+      padding: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.4rem;
+    }
+    textarea:focus {
+      outline: 2px solid var(--accent-color);
+    }
+    button {
+      padding: 10px;
+      font-size: 1.4rem;
+      border-radius: 5px;
+      border: none;
+      background: var(--button-bg);
+      color: var(--button-text);
+      margin: 10px 5px 0;
+      cursor: pointer;
+    }
+    button:hover {
+      background: var(--accent-color);
+      color: var(--text-color);
+    }
+    #output {
+      margin-top: 10px;
+      padding: 10px;
+      background: #222;
+      color: #0f0;
+      border-radius: 5px;
+      font-size: 1.4rem;
+      height: 15%;
+      overflow-y: auto;
+    }
+    .difficulty-selector {
+      margin-bottom: 20px;
+    }
+    .difficulty-selector label {
+      font-weight: bold;
+      margin-right: 10px;
+      font-size: 1.4rem;
+    }
+    .difficulty-selector select {
+      padding: 5px;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      border: none;
+    }
+    #question-output {
+      font-size: 1.6rem;
+      line-height: 1.8;
+      color: var(--question-color);
+    }
+    #complexity-output {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    #hint-box {
+      font-size: 1.4rem;
+    }
+    .submission-history, .leaderboard {
+      margin-top: 20px;
+      padding: 10px;
+      background: var(--box-bg);
+      border-radius: 5px;
+    }
+    .submission-history h3, .leaderboard h3 {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+    .submission-history ul, .leaderboard ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .submission-history li, .leaderboard li {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+    .correct {
+      color: var(--correct-color);
+    }
+    .incorrect {
+      color: var(--incorrect-color);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="greeting">Welcome, User!</div>
+    <div class="timer" id="timer">Time: 00:00</div>
+  </header>
+
+  <div class="main-container">
+    <!-- Question Panel -->
+    <div class="question-container">
+      <div class="difficulty-selector">
+        <label for="difficulty">Difficulty Level:</label>
+        <select id="difficulty" onchange="setDifficulty()">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+      <h2>Question</h2>
+      <div id="question-output">No question generated yet.</div>
+      <div id="complexity-output">Time Complexity: Not specified</div>
+      <button onclick="generateQuestion()">Generate Question</button>
+      <button onclick="toggleHint()">Show/Hide Hint</button>
+      <div id="hint-box" style="display: none;">Hint: Use built-in functions and logical steps!</div>
+      <div class="submission-history">
+        <h3>Submission History</h3>
+        <ul id="submission-history-list"></ul>
+      </div>
+    </div>
+
+    <!-- Code Editor Panel -->
+    <div class="editor-container">
+      <h2>Write Your Code</h2>
+      <select id="language-selector" onchange="setLanguage()">
+        <option value="javascript">JavaScript</option>
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+      </select>
+      <textarea id="code-editor" placeholder="Write your code here..."></textarea>
+      <div>
+        <button onclick="runCode()">Run Code</button>
+        <button onclick="resetCode()">Reset</button>
+        <button onclick="saveCode()">Save Code</button>
+      </div>
+      <div id="output">Output will appear here...</div>
+      <div class="leaderboard">
+        <h3>Leaderboard</h3>
+        <ul id="leaderboard-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let defaultCode = `console.log("Hello, World!");`;
+    let timerInterval;
+    let seconds = 0;
+    let minutes = 0;
+    let submissions = [];
+    let leaderboard = [];
+
+    const questions = {
+      easy: [
+        { question: "Write a function to reverse a string.", complexity: "O(n)" },
+        { question: "Find the maximum value in an array.", complexity: "O(n)" },
+        { question: "Write a function to check if a number is even.", complexity: "O(1)" },
+        { question: "Calculate the sum of numbers in an array.", complexity: "O(n)" },
+        { question: "Write a function to convert Celsius to Fahrenheit.", complexity: "O(1)" },
+        { question: "Find the index of an element in an array.", complexity: "O(n)" },
+        { question: "Write a function to capitalize the first letter of a string.", complexity: "O(n)" },
+        { question: "Check if a string contains a specific word.", complexity: "O(n)" },
+        { question: "Write a function to find the smallest number in an array.", complexity: "O(n)" },
+        { question: "Write a program to print the first 10 natural numbers.", complexity: "O(1)" }
+      ],
+      medium: [
+        { question: "Write a function to sort an array using bubble sort.", complexity: "O(n^2)" },
+        { question: "Find the factorial of a given number.", complexity: "O(n)" },
+        { question: "Write a function to check if a string is a palindrome.", complexity: "O(n)" },
+        { question: "Implement a basic calculator with add, subtract, multiply, and divide.", complexity: "O(1)" },
+        { question: "Write a function to find the second largest number in an array.", complexity: "O(n)" },
+        { question: "Implement a function to merge two sorted arrays.", complexity: "O(n + m)" },
+        { question: "Write a program to generate Fibonacci numbers up to n terms.", complexity: "O(n)" },
+        { question: "Check if a number is a prime number.", complexity: "O(sqrt(n))" },
+        { question: "Write a function to rotate an array by k positions.", complexity: "O(n)" },
+        { question: "Write a program to count the number of vowels in a string.", complexity: "O(n)" }
+      ],
+      hard: [
+        { question: "Write a function to solve the Tower of Hanoi problem.", complexity: "O(2^n)" },
+        { question: "Implement a function to check if two strings are anagrams.", complexity: "O(n)" },
+        { question: "Write a program to solve a Sudoku puzzle.", complexity: "O(9^(n*n))" },
+        { question: "Implement a binary search tree and its traversal methods.", complexity: "O(log(n)) for balanced trees" },
+        { question: "Write a function to find all subsets of a set.", complexity: "O(2^n)" },
+        { question: "Solve the N-Queens problem.", complexity: "O(n!)" },
+        { question: "Implement a function to perform matrix multiplication.", complexity: "O(n^3)" },
+        { question: "Write a function to find the longest increasing subsequence in an array.", complexity: "O(n^2) or O(n log(n))" },
+        { question: "Write a program to detect a cycle in a directed graph.", complexity: "O(V + E)" },
+        { question: "Implement a function to calculate the shortest path in a weighted graph.", complexity: "O(V^2) or O(E + V log(V)) for Dijkstra's" }
+      ]
+    };
+
+    // Generate question and time complexity
+    function generateQuestion() {
+      const difficulty = document.getElementById("difficulty").value;
+      const questionList = questions[difficulty];
+      const randomIndex = Math.floor(Math.random() * questionList.length);
+      const selectedQuestion = questionList[randomIndex];
+      document.getElementById("question-output").innerText = selectedQuestion.question;
+      document.getElementById("complexity-output").innerText = `Time Complexity: ${selectedQuestion.complexity}`;
+    }
+
+    // Timer and related functions
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        seconds++;
+        if (seconds === 60) {
+          seconds = 0;
+          minutes++;
+        }
+        document.getElementById("timer").innerText = `Time: ${formatTime(minutes)}:${formatTime(seconds)}`;
+      }, 1000);
+    }
+
+    function formatTime(time) {
+      return time < 10 ? `0${time}` : time;
+    }
+
+    // Toggle hint
+    function toggleHint() {
+      const hintBox = document.getElementById("hint-box");
+      hintBox.style.display = hintBox.style.display === "none" ? "block" : "none";
+    }
+
+    // Run code using Judge0 API
+    async function runCode() {
+      const code = document.getElementById("code-editor").value;
+      const language = document.getElementById("language-selector").value;
+      const output = document.getElementById("output");
+
+      const languageId = {
+        javascript: 63,
+        c: 50,
+        cpp: 54
+      }[language];
+
+      const response = await fetch("https://judge0-ce.p.rapidapi.com/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY", // Replace with your RapidAPI key
+          "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+        },
+        body: JSON.stringify({
+          source_code: code,
+          language_id: languageId
+        })
+      });
+
+      const data = await response.json();
+      const submissionId = data.token;
+
+      // Poll for result
+      const result = await pollSubmission(submissionId);
+      output.innerText = result;
+
+      // Update submission history
+      const submission = {
+        question: document.getElementById("question-output").innerText,
+        code: code,
+        result: result,
+        timestamp: new Date().toLocaleString()
+      };
+      submissions.push(submission);
+      updateSubmissionHistory();
+
+      // Update leaderboard
+      if (result.includes("Correct")) {
+        const userName = document.getElementById("greeting").innerText.replace("Welcome, ", "").replace("!", "");
+        const existingUser = leaderboard.find(user => user.name === userName);
+        if (existingUser) {
+          existingUser.score += 10;
+        } else {
+          leaderboard.push({ name: userName, score: 10 });
+        }
+        updateLeaderboard();
+      }
+    }
+
+    async function pollSubmission(submissionId) {
+      const response = await fetch(`https://judge0-ce.p.rapidapi.com/submissions/${submissionId}`, {
+        headers: {
+          "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY", // Replace with your RapidAPI key
+          "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+        }
+      });
+      const data = await response.json();
+      if (data.status.id <= 2) {
+        // Still processing
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return pollSubmission(submissionId);
+      } else {
+        return data.stdout || data.stderr || "No output";
+      }
+    }
+
+    // Reset code
+    function resetCode() {
+      document.getElementById("code-editor").value = defaultCode;
+      document.getElementById("output").innerText = "Output will appear here...";
+    }
+
+    // Save code
+    function saveCode() {
+      const code = document.getElementById("code-editor").value;
+      localStorage.setItem("savedCode", code);
+      alert("Code saved successfully!");
+    }
+
+    // Set difficulty
+    function setDifficulty() {
+      const difficulty = document.getElementById("difficulty").value;
+      alert(`Difficulty set to: ${difficulty}`);
+    }
+
+    // Set language
+    function setLanguage() {
+      const language = document.getElementById("language-selector").value;
+      defaultCode = language === "javascript" ? `console.log("Hello, World!");` :
+                   language === "c" ? `#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}` :
+                   `#include <iostream>\n\nint main() {\n    std::cout << "Hello, World!" << std::endl;\n    return 0;\n}`;
+      resetCode();
+    }
+
+    // Update submission history
+    function updateSubmissionHistory() {
+      const submissionHistoryList = document.getElementById("submission-history-list");
+      submissionHistoryList.innerHTML = submissions.map(sub => `
+        <li>
+          <strong>${sub.timestamp}</strong><br>
+          <pre>${sub.code}</pre><br>
+          <span class="${sub.result.includes("Correct") ? "correct" : "incorrect"}">${sub.result}</span>
+        </li>
+      `).join("");
+    }
+
+    // Update leaderboard
+    function updateLeaderboard() {
+      const leaderboardList = document.getElementById("leaderboard-list");
+      leaderboard.sort((a, b) => b.score - a.score);
+      leaderboardList.innerHTML = leaderboard.map(user => `
+        <li>${user.name}: ${user.score} points</li>
+      `).join("");
+    }
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => {
+      const userName = prompt("Enter your name:");
+      document.getElementById("greeting").innerText = `Welcome, ${userName || "User"}!`;
+      startTimer();
+      resetCode();
+    });
+  </script>
+</body>
+</html>
