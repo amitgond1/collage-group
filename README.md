@@ -1,4 +1,4 @@
-# 🎓 College project – Learning Platform
+# 🎓 College Project – Learning Platform
 
 A simple and interactive college-based learning website built using HTML and CSS. This project provides useful resources for students to learn Data Structures, C++, and practice coding problems in a structured and beginner-friendly way.
 
