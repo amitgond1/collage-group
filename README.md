@@ -54,10 +54,5 @@ This is a multi-page educational website designed for students to explore progra
 - Make it fully responsive  
 - Improve UI with animations  
 - Add real-time coding features  
-
-## 🙋‍♂️ Author
-
-**Amit Gond**
-
-- GitHub: https://github.com/amitgond1  
+ 
 
