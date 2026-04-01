@@ -60,4 +60,4 @@ This is a multi-page educational website designed for students to explore progra
 **Amit Gond**
 
 - GitHub: https://github.com/amitgond1  
-- LinkedIn: (Add your LinkedIn link here)  
+
