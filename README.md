@@ -4,7 +4,7 @@ A simple and interactive college-based learning website built using HTML and CSS
 
 ## 🌍 Live Website
 
-👉 https://amitgond1.github.io/collage-group/
+👉 https://amitgond1.github.io/collage-project/
 
 ## 🚀 About the Project
 
@@ -39,16 +39,6 @@ This is a multi-page educational website designed for students to explore progra
 - CSS3  
 - Basic JavaScript  
 - Git & GitHub  
-
-
-## 📌 How to Run Locally
-
-1. Clone the repository  
-   git clone https://github.com/amitgond1/collage-group.git  
-
-2. Open the folder  
-
-3. Run index.html in your browser  
 
 ## 🎯 Purpose
 
